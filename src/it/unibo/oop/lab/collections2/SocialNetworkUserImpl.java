@@ -1,7 +1,10 @@
 package it.unibo.oop.lab.collections2;
 
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 
@@ -29,6 +32,7 @@ public class SocialNetworkUserImpl<U extends User> extends UserImpl implements S
      * 
      * think of what type of keys and values would best suit the requirements
      */
+	private Map<String, LinkedList<U>> followedGroup;
 
     /*
      * [CONSTRUCTORS]
@@ -56,6 +60,11 @@ public class SocialNetworkUserImpl<U extends User> extends UserImpl implements S
      */
     public SocialNetworkUserImpl(final String name, final String surname, final String user, final int userAge) {
         super(name, surname, user, userAge);
+        this.followedGroup = new HashMap<String, LinkedList<U>>();
+    }
+    
+    public SocialNetworkUserImpl(final String name, final String surname, final String user) {
+    	this(name, surname, user, -1);
     }
 
     /*
@@ -66,17 +75,30 @@ public class SocialNetworkUserImpl<U extends User> extends UserImpl implements S
 
     @Override
     public boolean addFollowedUser(final String circle, final U user) {
-        return false;
+    	var group = this.followedGroup.get(circle);
+    	if (group == null) {
+    		this.followedGroup.put(circle, new LinkedList<U>());
+    	}
+    	return this.followedGroup.get(circle).add(user);
     }
 
     @Override
     public Collection<U> getFollowedUsersInGroup(final String groupName) {
-        return null;
+    	LinkedList<U> group = this.followedGroup.get(groupName);
+    	if (group != null) {
+    		return new LinkedList<U>(group);
+    	} else {
+    		return new LinkedList<U>();
+    	}
     }
 
     @Override
     public List<U> getFollowedUsers() {
-        return null;
+    	List<U> list = new LinkedList<U>();
+    	for (var l : this.followedGroup.values()) {
+    		list.addAll(l);
+    	}
+        return list;
     }
 
 }
