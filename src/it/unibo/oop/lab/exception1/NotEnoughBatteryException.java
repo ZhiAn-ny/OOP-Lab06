@@ -4,16 +4,16 @@ package it.unibo.oop.lab.exception1;
  * Represents an exception occurring when a robot has not enough battery 
  * to complete an action.
  *
- * @implNote Reason behind choice to extend RuntimeException:
- * I went on by exclusion. 
- * Exception alone was too generic, while IllegalStateException didn't 
- * seemed appropriate. In fact, a robot can exist despite having i.e. 0.1
- * battery left and not being able to complete an action. Therefore, it is 
- * a RuntimeException as we were not able to recharge the robot on time.
- * We can still recharge the robot in a second moment.
+ * @implNote Reason behind choice to extend IllegalStateException:
+ * Looked at the documentation of the exception types proposed.
+ * It can not extend RuntimeException, since that is an unchecked exception
+ * and indicates a point of no recovery in the execution of the program.
+ * It is also not suitable to extend IllegalStateException, since there are 
+ * no invalid inputs parameters. Just bad timing.
+ * Therefore it extends Exception.
  * 
  */
-public class NotEnoughBatteryException extends RuntimeException {
+public class NotEnoughBatteryException extends Exception {
 
 	/**
 	 * 
