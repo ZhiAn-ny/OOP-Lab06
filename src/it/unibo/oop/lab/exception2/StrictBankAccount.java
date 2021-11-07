@@ -1,5 +1,7 @@
 package it.unibo.oop.lab.exception2;
 
+import java.lang.invoke.WrongMethodTypeException;
+
 /**
  * Class modeling a BankAccount with strict policies: getting money is allowed
  * only with enough founds, and there are also a limited number of free ATM
@@ -36,10 +38,14 @@ public class StrictBankAccount implements BankAccount {
      * {@inheritDoc}
      */
     public void deposit(final int usrID, final double amount) {
-        if (checkUser(usrID)) {
-            this.balance += amount;
-            increaseTransactionsCount();
-        }
+    	try {
+	        if (checkUser(usrID)) {
+	            this.balance += amount;
+	            increaseTransactionsCount();
+	        }
+    	} catch (Exception e) {
+    		System.out.println(e.getMessage());
+    	}
     }
 
     /**
@@ -47,9 +53,13 @@ public class StrictBankAccount implements BankAccount {
      * {@inheritDoc}
      */
     public void withdraw(final int usrID, final double amount) {
-        if (checkUser(usrID) && isWithdrawAllowed(amount)) {
-            this.balance -= amount;
-            increaseTransactionsCount();
+        try {
+	    	if (checkUser(usrID) && isWithdrawAllowed(amount)) {
+	            this.balance -= amount;
+	            increaseTransactionsCount();
+	        }
+        } catch (Exception e) {
+        	System.out.println(e.getMessage());
         }
     }
 
@@ -58,9 +68,15 @@ public class StrictBankAccount implements BankAccount {
      * {@inheritDoc}
      */
     public void depositFromATM(final int usrID, final double amount) {
-        if (totalTransactionCount < maximumAllowedATMTransactions) {
-            this.deposit(usrID, amount - StrictBankAccount.ATM_TRANSACTION_FEE);
-        }
+    	try {
+	        if (totalTransactionCount < maximumAllowedATMTransactions) {
+	            this.deposit(usrID, amount - StrictBankAccount.ATM_TRANSACTION_FEE);
+	        } else {
+	        	throw new TransictionsOverQuotaException(maximumAllowedATMTransactions);
+	        }
+    	} catch (Exception e) {
+    		System.out.println(e.getMessage());
+    	}
     }
 
     /**
@@ -68,9 +84,15 @@ public class StrictBankAccount implements BankAccount {
      * {@inheritDoc}
      */
     public void withdrawFromATM(final int usrID, final double amount) {
-        if (totalTransactionCount < maximumAllowedATMTransactions) {
-            this.withdraw(usrID, amount + StrictBankAccount.ATM_TRANSACTION_FEE);
-        }
+    	try {
+	        if (totalTransactionCount < maximumAllowedATMTransactions) {
+	            this.withdraw(usrID, amount + StrictBankAccount.ATM_TRANSACTION_FEE);
+	        } else {
+	        	throw new TransictionsOverQuotaException(maximumAllowedATMTransactions);
+	        }
+    	} catch (Exception e) {
+    		System.out.println(e.getMessage());
+    	}
     }
 
     /**
@@ -93,8 +115,13 @@ public class StrictBankAccount implements BankAccount {
      * 
      * @param usrID
      *            id of the user related to these fees
+     *   
+     * @throw WrongAccountHolderException
+     * 
+     *        NotEnoughFoundsException
      */
-    public void computeManagementFees(final int usrID) {
+    public void computeManagementFees(final int usrID) 
+    		throws WrongAccountHolderException, NotEnoughFoundsException {
         final double feeAmount = MANAGEMENT_FEE + (totalTransactionCount * StrictBankAccount.TRANSACTION_FEE);
         if (checkUser(usrID) && isWithdrawAllowed(feeAmount)) {
             balance -= MANAGEMENT_FEE + totalTransactionCount * StrictBankAccount.TRANSACTION_FEE;
@@ -102,15 +129,21 @@ public class StrictBankAccount implements BankAccount {
         }
     }
 
-    private boolean checkUser(final int id) {
-        return this.usrID == id;
+    private boolean checkUser(final int id) throws WrongAccountHolderException {
+        if (this.usrID == id) {
+        	return true;
+        }
+        throw new WrongAccountHolderException();
     }
 
-    private boolean isWithdrawAllowed(final double amount) {
-        return balance > amount;
+    private boolean isWithdrawAllowed(final double amount) throws NotEnoughFoundsException {
+        if (balance > amount) {
+        	return true;
+        }
+        throw new NotEnoughFoundsException();
     }
 
     private void increaseTransactionsCount() {
-        totalTransactionCount++;
+        	totalTransactionCount++;
     }
 }
