@@ -41,6 +41,6 @@ public final class TestStrictBankAccount {
     	}
     	// Quota reached
     	mario.withdrawFromATM(1, 250);
-    	
+    
     }
 }
